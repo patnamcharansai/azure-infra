@@ -1,0 +1,39 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vmName": {
+      "value": "<replace-with-your-vm-name>"  // e.g., my-vm-dev
+    },
+    "vmSize": {
+      "value": "<replace-with-vm-size>"  // e.g., Standard_DS1_v2
+    },
+    "osType": {
+      "value": "<replace-with-os-type>"  // Linux or Windows
+    },
+    "adminUsername": {
+      "value": "<replace-with-admin-username>"  // e.g., azureuser
+    },
+    "adminPassword": {
+      "value": "<replace-with-secure-password>"  // Use a strong password; consider Key Vault for production
+    },
+    "sshPublicKey": {
+      "value": "<replace-with-your-ssh-public-key>"  // Optional for Linux VMs
+    },
+    "vnetName": {
+      "value": "<replace-with-spoke-vnet-name>"  // e.g., vnet-spoke-myproject-dev
+    },
+    "subnetName": {
+      "value": "<replace-with-subnet-name>"  // e.g., default
+    },
+    "enableDiskEncryption": {
+      "value": true  // Set to true for security
+    },
+    "tags": {
+      "value": {
+        "Environment": "<replace-with-environment>",  // e.g., dev
+        "Project": "<replace-with-project-name>"  // e.g., myproject
+      }
+    }
+  }
+}

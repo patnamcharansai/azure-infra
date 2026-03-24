@@ -17,7 +17,16 @@ The Bicep templates use the following parameters. Dynamic values like `location`
 - `hubRgName`: Name for the hub resource group (defaults to `rg-{projectName}-{environment}hub`)
 - `spokeRgName`: Name for the spoke resource group (defaults to `rg-{projectName}-{environment}spoke`)
 
-Update the `parameters.json` files with your specific values before deployment.
+## Deployment Order
+
+To deploy the infrastructure correctly, follow this sequence:
+
+1. **main.bicep** (Subscription level): Creates resource groups. Use `dev.parameters.json` or `prod.parameters.json`.
+2. **hub.bicep** (Hub resource group): Deploys hub VNet and subnets. Use `dev.parameters.json` or `prod.parameters.json`.
+3. **spoke.bicep** (Spoke resource group): Deploys spoke VNet and subnets. Use `dev.parameters.json` or `prod.parameters.json`.
+4. **vm.bicep** (Spoke resource group, optional): Deploys VMs. Use `vm.parameters.json` for dev or `vm.prod.parameters.json` for prod.
+
+Each step uses specific parameter files as indicated in the commands below.
 
 ## Deployment Commands
 
@@ -72,6 +81,21 @@ az deployment group create \
   --resource-group rg-myproject-prodspoke \
   --template-file spoke.bicep \
   --parameters @prod.parameters.json
+```
+
+### VM Deployments (Optional)
+```bash
+# Dev environment
+az deployment group create \
+  --resource-group rg-myproject-devspoke \
+  --template-file vm.bicep \
+  --parameters @vm.parameters.json
+
+# Prod environment (uses Key Vault for secrets)
+az deployment group create \
+  --resource-group rg-myproject-prodspoke \
+  --template-file vm.bicep \
+  --parameters @vm.prod.parameters.json
 ```
 
 Note: Update resource group names and locations as needed based on your parameters.
