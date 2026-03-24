@@ -32,9 +32,6 @@ param vnetName string
 @description('Name of the subnet in the VNet')
 param subnetName string
 
-@description('Enable Azure Disk Encryption (true/false)')
-param enableDiskEncryption bool = true
-
 @description('Tags for the resources')
 param tags object = {}
 
@@ -103,12 +100,6 @@ resource vm 'Microsoft.Compute/virtualMachines@2021-11-01' = {
         managedDisk: {
           storageAccountType: 'Premium_LRS'  // Use premium for better performance/security
         }
-        encryptionSettings: enableDiskEncryption ? {
-          enabled: true
-          diskEncryptionKey: {
-            // Key Vault integration for encryption (simplified; use actual KV in production)
-          }
-        } : null
       }
     }
     networkProfile: {
@@ -131,9 +122,6 @@ resource vm 'Microsoft.Compute/virtualMachines@2021-11-01' = {
     }
   }
   tags: tags
-  dependsOn: [
-    nsg
-  ]
 }
 
 // Network Interface for the VM
@@ -161,7 +149,8 @@ resource nic 'Microsoft.Network/networkInterfaces@2021-05-01' = {
 
 // Optional: VM extension for Azure Monitor Agent (for logging and monitoring)
 resource vmExtension 'Microsoft.Compute/virtualMachines/extensions@2021-11-01' = {
-  name: '${vmName}/AzureMonitorAgent'
+  parent: vm
+  name: 'AzureMonitorAgent'
   location: location
   properties: {
     publisher: 'Microsoft.Azure.Monitor'
@@ -169,9 +158,6 @@ resource vmExtension 'Microsoft.Compute/virtualMachines/extensions@2021-11-01' =
     typeHandlerVersion: '1.0'
     autoUpgradeMinorVersion: true
   }
-  dependsOn: [
-    vm
-  ]
 }
 
 // Output the VM's private IP

@@ -31,9 +31,6 @@
     "subnetName": {
       "value": "<replace-with-subnet-name>"  // e.g., default
     },
-    "enableDiskEncryption": {
-      "value": true  // Set to true for security
-    },
     "tags": {
       "value": {
         "Environment": "<replace-with-environment>",  // e.g., prod
