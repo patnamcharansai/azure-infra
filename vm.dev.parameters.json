@@ -15,12 +15,7 @@
       "value": "<replace-with-admin-username>"
     },
     "adminPassword": {
-      "reference": {
-        "keyVault": {
-          "id": "<replace-with-keyvault-resource-id>"
-        },
-        "secretName": "<replace-with-secret-name>"
-      }
+      "value": "<replace-with-secure-password>"
     },
     "sshPublicKey": {
       "value": "<replace-with-your-ssh-public-key>"
