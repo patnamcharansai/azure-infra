@@ -1,0 +1,41 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "storageAccountName": {
+      "value": "<replace-with-unique-storage-name>"
+    },
+    "sku": {
+      "value": "Standard_GRS"
+    },
+    "kind": {
+      "value": "StorageV2"
+    },
+    "accessTier": {
+      "value": "Hot"
+    },
+    "allowBlobPublicAccess": {
+      "value": false
+    },
+    "supportsHttpsTrafficOnly": {
+      "value": true
+    },
+    "minimumTlsVersion": {
+      "value": "TLS1_2"
+    },
+    "networkAcls": {
+      "value": {
+        "bypass": "None",
+        "defaultAction": "Deny",
+        "ipRules": [],
+        "virtualNetworkRules": []
+      }
+    },
+    "tags": {
+      "value": {
+        "Environment": "<replace-with-environment>",
+        "Project": "<replace-with-project-name>"
+      }
+    }
+  }
+}

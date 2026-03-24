@@ -34,11 +34,20 @@ The Bicep templates use the following parameters. Dynamic values like `location`
 - `subnetName`: existing subnet name in that VNet
 - `tags`: metadata fields
 
-### vm.prod.parameters.json fields
-- `vmName`, `vmSize`, `osType`, etc. as above
-- `adminPassword`: Key Vault reference block:
-  - `keyVault.id`: Key Vault resource ID
-  - `secretName`: Key Vault secret name
+### storage.dev.parameters.json fields
+- `storageAccountName`: Unique storage account name (lowercase, 3-24 chars)
+- `sku`: Storage SKU (e.g., Standard_LRS)
+- `kind`: Account kind (e.g., StorageV2)
+- `accessTier`: Hot or Cool
+- `allowBlobPublicAccess`: false (security)
+- `supportsHttpsTrafficOnly`: true
+- `minimumTlsVersion`: TLS1_2
+- `networkAcls`: Network access rules
+- `tags`: metadata fields
+
+### storage.prod.parameters.json fields
+- `storageAccountName`, `sku`, `kind`, etc. as above
+- `networkAcls`: For prod, set `bypass: "None"` and add specific VNet rules if needed
 
 ## Deployment Order
 
@@ -48,6 +57,7 @@ To deploy the infrastructure correctly, follow this sequence:
 2. **hub.bicep** (Hub resource group): Deploys hub VNet and subnets. Use `dev.parameters.json` or `prod.parameters.json`.
 3. **spoke.bicep** (Spoke resource group): Deploys spoke VNet and subnets. Use `dev.parameters.json` or `prod.parameters.json`.
 4. **vm.bicep** (Spoke resource group, optional): Deploys VMs. Use `vm.dev.parameters.json` for dev or `vm.prod.parameters.json` for prod.
+5. **storage.bicep** (Spoke resource group, optional): Deploys Storage Accounts. Use `storage.dev.parameters.json` for dev or `storage.prod.parameters.json` for prod.
 
 Each step uses specific parameter files as indicated in the commands below.
 
@@ -121,4 +131,17 @@ az deployment group create \
   --parameters @vm.prod.parameters.json
 ```
 
-Note: Update resource group names and locations as needed based on your parameters.
+### Storage Deployments (Optional)
+```bash
+# Dev environment
+az deployment group create \
+  --resource-group rg-myproject-devspoke \
+  --template-file storage.bicep \
+  --parameters @storage.dev.parameters.json
+
+# Prod environment
+az deployment group create \
+  --resource-group rg-myproject-prodspoke \
+  --template-file storage.bicep \
+  --parameters @storage.prod.parameters.json
+```
