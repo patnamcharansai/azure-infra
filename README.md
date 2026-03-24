@@ -11,14 +11,14 @@ az deployment sub what-if \
   --location eastus \
   --template-file main.bicep \
   --parameters @prod.parameters.json
-=====================================================================================================
+==========================================================================================
 
 az deployment sub create \
   --location eastus \
   --template-file main.bicep \
   --parameters @dev.parameters.json
 
-===========================================================================================
+==========================================================================================
 
 
 az deployment group create \
