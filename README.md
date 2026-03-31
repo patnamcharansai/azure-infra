@@ -9,13 +9,24 @@ This repository contains Bicep templates for deploying Azure hub-and-spoke netwo
 
 ## Parameters
 
-The Bicep templates use the following parameters. Dynamic values like `location` and `environment` should be specified in the `parameters.json` files (e.g., `dev.parameters.json`, `prod.parameters.json`).
+Each Bicep template has specific parameter files for dev and prod environments. Use the corresponding parameter files with each template:
 
-- `location`: Azure region for resource deployment (e.g., "eastus")
+**Common parameters across templates:**
 - `projectName`: Name of the project (used in resource naming)
-- `environment`: Deployment environment (e.g., "dev", "prod", "test")
-- `hubRgName`: Name for the hub resource group (defaults to `rg-{projectName}-{environment}hub`)
-- `spokeRgName`: Name for the spoke resource group (defaults to `rg-{projectName}-{environment}spoke`)
+- `environment`: Deployment environment (e.g., "dev", "prod")
+
+**main.bicep parameters (Subscription level):**
+- `location`: Azure region for resource deployment (e.g., "CentralIndia", "westeurope")
+- `projectName`: Project name
+- `environment`: Environment name
+- Files: `main.dev.parameters.json`, `main.prod.parameters.json`
+
+**hub.bicep & spoke.bicep parameters (Resource group level):**
+- `projectName`: Project name
+- `environment`: Environment name
+- `hubAddressSpace` / `spokeAddressSpace`: VNet address space (e.g., "10.0.0.0/16")
+- (Location is inherited from the resource group, no `location` parameter needed)
+- Files: `hub.dev.parameters.json`, `hub.prod.parameters.json`, `spoke.dev.parameters.json`, `spoke.prod.parameters.json`
 
 ## Parameter Field Guide (JSON rules)
 
@@ -53,9 +64,9 @@ The Bicep templates use the following parameters. Dynamic values like `location`
 
 To deploy the infrastructure correctly, follow this sequence:
 
-1. **main.bicep** (Subscription level): Creates resource groups. Use `dev.parameters.json` or `prod.parameters.json`.
-2. **hub.bicep** (Hub resource group): Deploys hub VNet and subnets. Use `dev.parameters.json` or `prod.parameters.json`.
-3. **spoke.bicep** (Spoke resource group): Deploys spoke VNet and subnets. Use `dev.parameters.json` or `prod.parameters.json`.
+1. **main.bicep** (Subscription level): Creates resource groups. Use `main.dev.parameters.json` for dev or `main.prod.parameters.json` for prod.
+2. **hub.bicep** (Hub resource group): Deploys hub VNet and subnets. Use `hub.dev.parameters.json` for dev or `hub.prod.parameters.json` for prod.
+3. **spoke.bicep** (Spoke resource group): Deploys spoke VNet and subnets. Use `spoke.dev.parameters.json` for dev or `spoke.prod.parameters.json` for prod.
 4. **vm.bicep** (Spoke resource group, optional): Deploys VMs. Use `vm.dev.parameters.json` for dev or `vm.prod.parameters.json` for prod.
 5. **storage.bicep** (Spoke resource group, optional): Deploys Storage Accounts. Use `storage.dev.parameters.json` for dev or `storage.prod.parameters.json` for prod.
 
@@ -72,48 +83,55 @@ cd "/c/Users/patna/OneDrive/Desktop/Azure Learning/azurebiceps/azure-infra"
 ### What-If (Preview) Deployments
 ```bash
 az deployment sub what-if \
-  --location eastus \
+  --location CentralIndia \
   --template-file main.bicep \
-  --parameters @dev.parameters.json
+  --parameters @main.dev.parameters.json
 
 az deployment sub what-if \
-  --location eastus \
+  --location westeurope \
   --template-file main.bicep \
-  --parameters @prod.parameters.json
+  --parameters @main.prod.parameters.json
 ```
 
-### Actual Deployments
+### Main Deployments (Subscription Level)
 ```bash
+# Dev environment
 az deployment sub create \
-  --location eastus \
+  --location CentralIndia \
   --template-file main.bicep \
-  --parameters @dev.parameters.json
+  --parameters @main.dev.parameters.json
+
+# Prod environment
+az deployment sub create \
+  --location westeurope \
+  --template-file main.bicep \
+  --parameters @main.prod.parameters.json
 ```
 
 ### Hub Deployments
 ```bash
 az deployment group create \
-  --resource-group rg-myproject-devhub \
+  --resource-group rg-charanlab-devhub \
   --template-file hub.bicep \
-  --parameters @dev.parameters.json
+  --parameters @hub.dev.parameters.json
 
 az deployment group create \
   --resource-group rg-myproject-prodhub \
   --template-file hub.bicep \
-  --parameters @prod.parameters.json
+  --parameters @hub.prod.parameters.json
 ```
 
 ### Spoke Deployments
 ```bash
 az deployment group create \
-  --resource-group rg-myproject-devspoke \
+  --resource-group rg-charanlab-devspoke \
   --template-file spoke.bicep \
-  --parameters @dev.parameters.json
+  --parameters @spoke.dev.parameters.json
 
 az deployment group create \
   --resource-group rg-myproject-prodspoke \
   --template-file spoke.bicep \
-  --parameters @prod.parameters.json
+  --parameters @spoke.prod.parameters.json
 ```
 
 ### VM Deployments (Optional)
